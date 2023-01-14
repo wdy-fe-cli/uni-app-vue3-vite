@@ -1,0 +1,153 @@
+.uni-tabbar-border {
+  background-color: #eaeaea !important;
+  height: 3px;
+}
+
+// 去掉按钮边框
+button::after {
+  border: none !important;
+}
+
+uni-modal {
+  .uni-modal {
+    border-radius: 24rpx;
+  }
+  .uni-modal__btn_primary {
+    color: $uni-color-primary !important;
+  }
+  .uni-modal__hd {
+    padding: 40rpx 0 0;
+    .uni-modal__title {
+      font-size: 32rpx;
+      font-weight: 500;
+    }
+  }
+  .uni-modal__bd {
+    font-size: 26rpx;
+    color: #999999;
+    // padding: 20rpx 0 50rpx;
+    padding: 16rpx 62rpx 40rpx;
+  }
+}
+
+uni-radio {
+  .uni-radio-input {
+    width: 32rpx;
+    height: 32rpx;
+  }
+  .uni-radio-input-checked {
+    background-color: $uni-color-primary !important;
+    color: $uni-color-primary !important;
+    border-color: $uni-color-primary !important;
+  }
+}
+
+// 去除滚动条
+::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+  height: 0 !important;
+  -webkit-appearance: none;
+  background: transparent;
+}
+
+view,
+scroll-view,
+swiper,
+swiper-item,
+cover-view,
+cover-image,
+icon,
+text,
+rich-text,
+progress,
+button,
+checkbox,
+form,
+input,
+label,
+radio,
+slider,
+switch,
+textarea,
+navigator,
+audio,
+camera,
+image,
+video {
+  box-sizing: border-box;
+}
+/* 骨架屏替代方案 */
+.Skeleton {
+  background: #f3f3f3;
+  padding: 20rpx 0;
+  border-radius: 8rpx;
+}
+
+/* 图片载入替代方案 */
+.image-wrapper {
+  font-size: 0;
+  background: #f3f3f3;
+  border-radius: 4px;
+
+  image {
+    width: 100%;
+    height: 100%;
+    transition: 0.6s;
+    opacity: 0;
+
+    &.loaded {
+      opacity: 1;
+    }
+  }
+}
+
+.clamp {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.common-hover {
+  background: #f5f5f5;
+}
+
+/*边框*/
+.b-b:after,
+.b-t:after {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  height: 0;
+  content: '';
+  transform: scaleY(0.5);
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.b-b:after {
+  bottom: 0;
+}
+
+.b-t:after {
+  top: 0;
+}
+
+/* button样式改写 */
+uni-button,
+button {
+  height: 80rpx;
+  line-height: 80rpx;
+  font-weight: normal;
+
+  &.no-border:before,
+  &.no-border:after {
+    border: 0;
+  }
+}
+
+uni-button[type='default'],
+button[type='default'] {
+  color: #333333;
+}

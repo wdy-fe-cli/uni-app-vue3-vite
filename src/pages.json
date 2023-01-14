@@ -1,0 +1,125 @@
+{
+  "easycom": {
+    "^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+  },
+  "pages": [
+    {
+      "path": "pages/index",
+      "style": {
+        "navigationBarTitleText": "氧惠"
+      }
+    },
+    {
+      "path": "pages/team-pk/index",
+      "style": {
+        "navigationBarTitleText": "百万现金团队PK赛"
+      }
+    },
+    {
+      "path": "pages/individual-pk/index",
+      "style": {
+        "navigationBarTitleText": "邀请好友PK赛"
+      }
+    },
+    {
+      "path": "pages/material/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/material/HasTitle",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "subPackages": [
+    {
+      "root": "pages/download",
+      "pages": [
+        {
+          "path": "YHApp",
+          "style": {
+            "navigationBarTitleText": "氧惠"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages/third-page",
+      "pages": [
+        {
+          "path": "TBShare",
+          "style": {
+            "navigationBarTitleText": "商品详情"
+          }
+        },
+        {
+          "path": "TC",
+          "style": {
+            "navigationBarTitleText": "同城"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages/app",
+      "pages": [
+        {
+          "path": "ChargeMiddle",
+          "style": {
+            "navigationBarTitleText": "话费充值"
+          }
+        },
+        {
+          "path": "converge/ZXDD",
+          "style": {
+            "navigationBarTitleText": "在线点单"
+          }
+        },
+        {
+          "path": "converge/WM",
+          "style": {
+            "navigationBarTitleText": "省钱外卖"
+          }
+        },
+        {
+          "path": "custom-page/index",
+          "style": {
+            "navigationBarTitleText": "自定义页面"
+          }
+        },
+        {
+          "path": "BeginnerHelp",
+          "style": {
+            "navigationBarTitleText": "新手教程"
+          }
+        },
+        {
+          "path": "Play",
+          "style": {
+            "navigationBarTitleText": "新手教程"
+          }
+        },
+        {
+          "path": "Guide",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "CloudOrder",
+          "style": {
+            "navigationBarTitleText": "氧惠"
+          }
+        }
+      ]
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "氧惠",
+    "backgroundColor": "#ffffff"
+  }
+}

@@ -1,0 +1,45 @@
+.z1 {
+  position: relative;
+  z-index: 1;
+}
+.text-hidden {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-2-hidden {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.word-break {
+  word-break: break-all;
+}
+// 可以封装成一个类，之后在需要的地方添加该类即可
+.clearfix:after {
+  content: ''; // 设置内容为空
+  clear: both; // 清除浮动
+  display: block; // clear属性只对块元素生效，伪类是内联元素，需要转为block
+}
+
+.safe-bottom {
+  padding-bottom: calc(16rpx + constant(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom)) !important;
+}
+
+.prevent-scroll {
+  overflow: hidden;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+}
+
+uni-toast .uni-simple-toast__text {
+  background: rgba(0, 0, 2, 0.72);
+  border-radius: 300rpx;
+  border: 3rpx solid #ffffff;
+}
