@@ -1,27 +1,17 @@
 {
-  "editor.formatOnType": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "editor.formatOnSave": true,
-  "javascript.preferences.quoteStyle": "single",
-  "javascript.format.insertSpaceBeforeFunctionParenthesis": true, //  #让函数(名)和后面的括号之间加个空格*
-  "javascript.updateImportsOnFileMove.enabled": "always",
-  "typescript.validate.enable": false,
-  "html.format.wrapAttributes": "force-aligned",
-
-  "vetur.format.defaultFormatter.html": "js-beautify-html",
-  "vetur.format.defaultFormatterOptions": {
-    "js-beautify-html": {
-      "wrap_line_length": 120,
-      "wrap_attributes": "force-aligned", // 第一个属性不折行，后续所有属性和第一个对齐折行*
-      "end_with_newline": false
-    }
+  "editor.formatOnPaste": false,
+  "editor.formatOnType": true,
+  "prettier.enable": true,
+  "prettier.configPath": "./.vscode/code-lint-prettier.json",
+  "eslint.enable": true,
+  "eslint.options": {
+    "ignorePath": "./.vscode/.eslintignore",
+    "overrideConfigFile": "./.vscode/code-lint-vue3.json"
   },
-  "[vue]": {
-    "editor.defaultFormatter": "octref.vetur"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "scss.lint.unknownAtRules": "ignore"
 }

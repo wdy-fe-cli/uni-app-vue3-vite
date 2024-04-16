@@ -1,12 +1,20 @@
-import { postMessage } from './H5PostMessage'
+import { http, appId } from '@/api/index.js'
+import { setStorage, getStorage } from '@/utils/storage'
 
-export const goLogin = () => {
+let loginLock = false
+
+export const login = function () {
+  if (loginLock) return
+  loginLock = true
   uni.showToast({
-    title: '请先登录',
+    title: '登录信息失效',
     icon: 'none',
-    mask: true,
+    mask: true
   })
   setTimeout(() => {
-    postMessage('JUMP_OTHER_PAGE', 'app:/pages/login/index')
+    uni.reLaunch({ url: '/pages/login/index' })
   }, 1500)
+  setTimeout(() => {
+    loginLock = false
+  }, 500)
 }

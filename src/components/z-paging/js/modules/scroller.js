@@ -5,6 +5,7 @@ import Enum from '.././z-paging-enum'
 // #ifdef APP-NVUE
 const weexDom = weex.requireModule('dom');
 // #endif
+
 export default {
 	props: {
 		//使用页面滚动，默认为否，当设置为是时则使用页面的滚动而非此组件内部的scroll-view的滚动，使用页面滚动时z-paging无需设置确定的高度且对于长列表展示性能更高，但配置会略微繁琐
@@ -70,10 +71,10 @@ export default {
 		},
 		usePageScroll: {
 			handler(newVal) {
-				this.loaded && this.autoHeight && this._setAutoHeight(!newVal)
+				this.loaded && this.autoHeight && this._setAutoHeight(!newVal);
 				// #ifdef H5
 				if (newVal) {
-					this.$nextTick(()=>{
+					this.$nextTick(() => {
 						const mainScrollRef = this.$refs['zp-scroll-view'].$refs.main;
 						if (mainScrollRef) {
 							mainScrollRef.style = {};
@@ -118,7 +119,7 @@ export default {
 		scrollToTop(animate, checkReverse = true) {
 			// #ifdef APP-NVUE
 			if (checkReverse && this.useChatRecordMode) {
-				if(!this.nIsFirstPageAndNoMore){
+				if (!this.nIsFirstPageAndNoMore) {
 					this.scrollToBottom(animate, false);
 					return;
 				}
@@ -128,9 +129,9 @@ export default {
 				this._scrollToTop(animate, false);
 				// #ifdef APP-NVUE
 				if (this.nvueFastScroll && animate) {
-					setTimeout(() => {
+					u.delay(() => {
 						this._scrollToTop(false, false);
-					}, 150);
+					});
 				}
 				// #endif
 			})
@@ -139,7 +140,7 @@ export default {
 		scrollToBottom(animate, checkReverse = true) {
 			// #ifdef APP-NVUE
 			if (checkReverse && this.useChatRecordMode) {
-				if(!this.nIsFirstPageAndNoMore){
+				if (!this.nIsFirstPageAndNoMore) {
 					this.scrollToTop(animate, false);
 					return;
 				}
@@ -149,9 +150,9 @@ export default {
 				this._scrollToBottom(animate);
 				// #ifdef APP-NVUE
 				if (this.nvueFastScroll && animate) {
-					setTimeout(() => {
+					u.delay(() => {
 						this._scrollToBottom(false);
-					}, 150);
+					});
 				}
 				// #endif
 			})
@@ -196,9 +197,8 @@ export default {
 		},
 		//更新slot="left"和slot="right"宽度，当slot="left"或slot="right"宽度动态改变时调用
 		updateLeftAndRightWidth() {
-			this.$nextTick(() => {
-				this._updateLeftAndRightWidth();
-			})
+			if (!this.finalIsOldWebView) return;
+			this.$nextTick(() => this._updateLeftAndRightWidth(this.scrollViewContainerStyle, 'zp-page'));
 		},
 		//更新z-paging内置scroll-view的scrollTop
 		updateScrollViewScrollTop(scrollTop, animate = true) {
@@ -211,22 +211,24 @@ export default {
 		},
 		
 		//当滚动到顶部时
-		_scrollToUpper() {
+		_onScrollToUpper() {
 			this.$emit('scrolltoupper');
 			this.$emit('scrollTopChange', 0);
 			this.$nextTick(() => {
 				this.oldScrollTop = 0;
 			})
-			if (!this.useChatRecordMode) return;
-			if (this.loadingStatus === Enum.More.NoMore) return;
-			this._onLoadingMore('click');
+			this.useChatRecordMode && this.loadingStatus !== Enum.More.NoMore && this._onLoadingMore('click');
+		},
+		//当滚动到底部时
+		_onScrollToLower(e) {
+			(!e.detail || !e.detail.direction || e.detail.direction === 'bottom') && this._onLoadingMore('toBottom')
 		},
 		//滚动到顶部
 		_scrollToTop(animate = true, isPrivate = true) {
 			// #ifdef APP-NVUE
 			const el = this.$refs['zp-n-list-top-tag'];
 			if (this.usePageScroll) {
-				this._getNodeClientRect('zp-page-scroll-top', false).then((node) => {
+				this._getNodeClientRect('zp-page-scroll-top', false).then(node => {
 					const nodeHeight = node ? node[0].height : 0;
 					weexDom.scrollToElement(el, {
 						offset: -nodeHeight,
@@ -235,7 +237,7 @@ export default {
 				});
 			} else {
 				if (!this.isIos && this.nvueListIs === 'scroller') {
-					this._getNodeClientRect('zp-n-refresh-container', false).then((node) => {
+					this._getNodeClientRect('zp-n-refresh-container', false).then(node => {
 						const nodeHeight = node ? node[0].height : 0;
 						weexDom.scrollToElement(el, {
 							offset: -nodeHeight,
@@ -333,16 +335,11 @@ export default {
 					}
 					return;
 					// #endif
-					if (sel.indexOf('#') != -1) {
-						sel = sel.replace('#', '');
-					}
-					this._getNodeClientRect('#' + sel, false).then((node) => {
+					this._getNodeClientRect('#' + sel.replace('#', ''), this.$parent).then((node) => {
 						if (node) {
 							let nodeTop = node[0].top;
 							this._scrollIntoViewByNodeTop(nodeTop, offset, animate);
-							if (finishCallback) {
-								finishCallback();
-							}
+							finishCallback && finishCallback();
 						}
 					});
 				});
@@ -379,15 +376,51 @@ export default {
 			const scrollDiff = e.detail.scrollHeight - this.oldScrollTop;
 			!this.isIos && this._checkScrolledToBottom(scrollDiff);
 		},
+		//检测scrollView是否要铺满屏幕
+		_doCheckScrollViewShouldFullHeight(totalData) {
+			if (this.autoFullHeight && this.usePageScroll && this.isTotalChangeFromAddData) {
+				// #ifndef APP-NVUE
+				this.$nextTick(() => {
+					this._checkScrollViewShouldFullHeight((scrollViewNode, pagingContainerNode) => {
+						this._preCheckShowNoMoreInside(totalData, scrollViewNode, pagingContainerNode)
+					});
+				})
+				// #endif
+				// #ifdef APP-NVUE
+				this._preCheckShowNoMoreInside(totalData)
+				// #endif
+			} else {
+				this._preCheckShowNoMoreInside(totalData)
+			} 
+		},
+		//检测z-paging是否要全屏覆盖(当使用页面滚动并且不满全屏时，默认z-paging需要铺满全屏，避免数据过少时内部的empty-view无法正确展示)
+		async _checkScrollViewShouldFullHeight(callback) {
+			try {
+				const scrollViewNode = await this._getNodeClientRect('.zp-scroll-view');
+				const pagingContainerNode = await this._getNodeClientRect('.zp-paging-container-content');
+				if (!scrollViewNode || !pagingContainerNode) return;
+				const scrollViewHeight = pagingContainerNode[0].height;
+				const scrollViewTop = scrollViewNode[0].top;
+				if (this.isAddedData && scrollViewHeight + scrollViewTop <= this.windowHeight) {
+					this._setAutoHeight(true, scrollViewNode);
+					callback(scrollViewNode, pagingContainerNode);
+				} else {
+					this._setAutoHeight(false);
+					callback(null, null);
+				}
+			} catch (e) {
+				callback(null, null);
+			}
+		},
 		//scrollTop改变时触发
 		_scrollTopChange(newVal, isPageScrollTop){
 			this.$emit('scrollTopChange', newVal);
 			this.$emit('update:scrollTop', newVal);
 			this._checkShouldShowBackToTop(newVal);
-			const scrollTop = this.isIos ? (newVal > 5 ? 6 : 0) : newVal;
-			if (isPageScrollTop) {
+			const scrollTop = newVal > 5 ? 6 : 0;
+			if (isPageScrollTop && this.wxsPageScrollTop !== scrollTop) {
 				this.wxsPageScrollTop = scrollTop;
-			} else {
+			} else if (!isPageScrollTop && this.wxsScrollTop !== scrollTop) {
 				this.wxsScrollTop = scrollTop;
 			}
 		},
@@ -405,7 +438,7 @@ export default {
 				// #ifdef MP-BAIDU || APP-NVUE
 				delayTime = 50;
 				// #endif
-				setTimeout(() => {
+				u.delay(() => {
 					this._getNodeClientRect(node).then((res) => {
 						if (res) {
 							let pageScrollNodeHeight = res[0].height;
@@ -424,22 +457,5 @@ export default {
 				}, delayTime)
 			})
 		},
-		//获取slot="left"和slot="right"宽度并且更新布局
-		_updateLeftAndRightWidth(){
-			if (!this.finalIsOldWebView) return;
-			this.$nextTick(() => {
-				let delayTime = 0;
-				// #ifdef MP-BAIDU
-				delayTime = 10;
-				// #endif
-				setTimeout(() => {
-					['left','right'].map(position => {
-						this._getNodeClientRect(`.zp-page-${position}`).then((res) => {
-							this.$set(this.scrollViewContainerStyle, position, res ? res[0].width + 'px' : '0px');
-						});
-					})
-				}, delayTime)
-			})
-		}
 	}
 }

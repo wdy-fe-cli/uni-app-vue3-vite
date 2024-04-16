@@ -7,17 +7,22 @@ import u from '.././z-paging-utils'
 import c from '.././z-paging-constant'
 import interceptor from '../z-paging-interceptor'
 
+const language = uni.getSystemInfoSync().language;
 export default {
 	data() {
 		return {
-			language: uni.getSystemInfoSync().language
+			language
 		}
 	},
 	computed: {
 		finalLanguage() {
-			const local = uni.getLocale();
-			const language = this.language;
-			return local === 'auto' ? interceptor._handleLanguage2Local(language, this._language2Local(language)) : local;
+			try {
+				const local = uni.getLocale();
+				const language = this.language;
+				return local === 'auto' ? interceptor._handleLanguage2Local(language, this._language2Local(language)) : local;
+			} catch (e) {
+				return 'zh-Hans';
+			}
 		},
 		finalRefresherDefaultText() {
 			return this._getI18nText('zp.refresher.default', this.refresherDefaultText);

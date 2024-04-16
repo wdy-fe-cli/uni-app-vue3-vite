@@ -181,14 +181,10 @@ export default {
 		},
 		//通过@scroll事件检测是否滚动到了底部
 		_checkScrolledToBottom(scrollDiff, checked = false) {
-			if (this.checkScrolledToBottomTimeOut) {
-				clearTimeout(this.checkScrolledToBottomTimeOut);
-				this.checkScrolledToBottomTimeOut = null;
-			}
 			if (this.cacheScrollNodeHeight === -1) {
 				this._getNodeClientRect('.zp-scroll-view').then((res) => {
 					if (res) {
-						let pageScrollNodeHeight = res[0].height;
+						const pageScrollNodeHeight = res[0].height;
 						this.cacheScrollNodeHeight = pageScrollNodeHeight;
 						if (scrollDiff - pageScrollNodeHeight <= this.finalLowerThreshold) {
 							this._onLoadingMore('toBottom');
@@ -199,17 +195,17 @@ export default {
 				if (scrollDiff - this.cacheScrollNodeHeight <= this.finalLowerThreshold) {
 					this._onLoadingMore('toBottom');
 				} else if (scrollDiff - this.cacheScrollNodeHeight <= 500 && !checked) {
-					this.checkScrolledToBottomTimeOut = setTimeout(() => {
+					u.delay(() => {
 						this._getNodeClientRect('.zp-scroll-view', true, true).then((res) => {
 							this.oldScrollTop = res[0].scrollTop;
 							const newScrollDiff = res[0].scrollHeight - this.oldScrollTop;
 							this._checkScrolledToBottom(newScrollDiff, true);
 						})
-					}, 150)
+					}, 150, 'checkScrolledToBottomDelay')
 				}
 			}
 		},
-		//触发加载更多时调用,from:0-滑动到底部触发；1-点击加载更多触发
+		//触发加载更多时调用,from:toBottom-滑动到底部触发；1、click-点击加载更多触发
 		_onLoadingMore(from = 'click') {
 			if (from === 'toBottom' && !this.scrollToBottomBounceEnabled && this.scrollEnable) {
 				this.scrollEnable = false;
@@ -237,8 +233,8 @@ export default {
 				this.pageNo ++;
 				this._startLoading(false);
 				if (this.isLocalPaging) {
-					this._localPagingQueryList(this.pageNo, this.defaultPageSize, this.localPagingLoadingTime, (res) => {
-						this.addData(res);
+					this._localPagingQueryList(this.pageNo, this.defaultPageSize, this.localPagingLoadingTime, res => {
+						this.completeByTotal(res, this.totalLocalPagingList.length);
 					})
 				} else {
 					this._emitQuery(this.pageNo, this.defaultPageSize, Enum.QueryFrom.LoadingMore);
@@ -295,10 +291,11 @@ export default {
 		},
 		//是否要展示上拉加载更多view
 		_showLoadingMore(type) {
-			if (!this.showLoadingMoreWhenReload && (!(this.loadingStatus === Enum.More.Default ? this.nShowBottom : true) || !this.totalData.length)) return false;
+			if (!this.showLoadingMoreWhenReload && (!(this.loadingStatus === Enum.More.Default ? this.nShowBottom : true) || !this.realTotalData.length)) return false;
 			if (((!this.showLoadingMoreWhenReload || this.isUserPullDown || this.loadingStatus !== Enum.More.Loading) && !this.showLoadingMore) || 
-			(!this.loadingMoreEnabled && (!this.showLoadingMoreWhenReload || this.isUserPullDown || this.loadingStatus !== Enum.More.Loading)) || 
-			this.refresherOnly) return false;
+			(!this.loadingMoreEnabled && (!this.showLoadingMoreWhenReload || this.isUserPullDown || this.loadingStatus !== Enum.More.Loading)) || this.refresherOnly) {
+				return false;
+			}
 			if (this.useChatRecordMode && type !== 'Loading') return false;
 			if (!this.$slots) return false;
 			if (type === 'Custom') {

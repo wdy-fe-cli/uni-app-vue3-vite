@@ -41,6 +41,7 @@
 
 .zp-scroll-view-super {
 	flex: 1;
+	overflow: hidden;
 	position: relative;
 }
 
@@ -49,6 +50,7 @@
 	display: flex;
 	/* #endif */
 	flex-direction: row;
+	z-index: -1;
 }
 
 .zp-custom-refresher-container {

@@ -1,8 +1,13 @@
 const path = require('path')
+const comment = require('postcss-comment')
+const tailwindcss = require('tailwindcss')
+const autoprefixer = require('autoprefixer')
+const postcssImport = require('postcss-import')
+
 module.exports = {
-  parser: require('postcss-comment'),
+  parser: comment,
   plugins: [
-    require('postcss-import')({
+    postcssImport({
       resolve(id, basedir, importOptions) {
         if (id.startsWith('~@/')) {
           return path.resolve(process.env.UNI_INPUT_DIR, id.substr(3))
@@ -14,9 +19,11 @@ module.exports = {
         return id
       },
     }),
-    require('autoprefixer')({
-      remove: process.env.UNI_PLATFORM !== 'h5',
+    tailwindcss({
+      config: './tailwind.config.js',
     }),
-    require('@dcloudio/vue-cli-plugin-uni/packages/postcss'),
+    autoprefixer({
+      remove: true,
+    }),
   ],
 }

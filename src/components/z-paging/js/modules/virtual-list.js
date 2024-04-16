@@ -51,10 +51,10 @@ export default {
 				return u.gc('innerCellStyle', {});
 			}
 		},
-		//预加载的列表可视范围(列表高度)页数，默认为7，即预加载当前页及上下各7页的cell。此数值越大，则虚拟列表中加载的dom越多，内存消耗越大(会维持在一个稳定值)，但增加预加载页面数量可缓解快速滚动短暂白屏问题
+		//预加载的列表可视范围(列表高度)页数，默认为12，即预加载当前页及上下各12页的cell。此数值越大，则虚拟列表中加载的dom越多，内存消耗越大(会维持在一个稳定值)，但增加预加载页面数量可缓解快速滚动短暂白屏问题
 		preloadPage: {
 			type: [Number, String],
-			default: u.gc('preloadPage', 7),
+			default: u.gc('preloadPage', 12),
 			validator: (value) => {
 				if (value <= 0) u.consoleErr('preload-page必须大于0！');
 				return value > 0;
@@ -90,6 +90,7 @@ export default {
 			virtualBottomRangeIndex: 0,
 			lastVirtualTopRangeIndex: 0,
 			lastVirtualBottomRangeIndex: 0,
+			virtualItemInsertedCount: 0,
 			
 			virtualHeightCacheList: [],
 			
@@ -107,10 +108,8 @@ export default {
 			if (this.finalUseVirtualList) {
 				this.updateVirtualListFromDataChange = true;
 				this.$nextTick(() => {
-					if (!newVal.length) {
-						this._resetDynamicListState(!this.isUserPullDown);
-					}
 					this.getCellHeightRetryCount.fixed = 0;
+					!newVal.length && this._resetDynamicListState(!this.isUserPullDown);
 					newVal.length && this.cellHeightMode === Enum.CellHeightMode.Fixed && this.isFirstPage && this._updateFixedCellHeight();
 					this._updateVirtualScroll(this.oldScrollTop);
 				})
@@ -123,6 +122,9 @@ export default {
 		}
 	},
 	computed: {
+		virtualCellIndexKey() {
+			return c.listCellIndexKey;
+		},
 		finalUseVirtualList() {
 			if (this.useVirtualList && this.usePageScroll){
 				u.consoleErr('使用页面滚动时，开启虚拟列表无效！');
@@ -130,7 +132,7 @@ export default {
 			return this.useVirtualList && !this.usePageScroll;
 		},
 		finalUseInnerList() {
-			return this.useInnerList || (this.finalUseVirtualList && !this.forceCloseInnerList)
+			return this.useInnerList || (this.finalUseVirtualList && !this.forceCloseInnerList);
 		},
 		finalCellKeyName() {
 			// #ifdef APP-NVUE
@@ -142,7 +144,6 @@ export default {
 		},
 		finalVirtualPageHeight(){
 			return this.virtualPageHeight > 0 ? this.virtualPageHeight : this.windowHeight;
-			return virtualPageHeight * this.preloadPage;
 		},
 		virtualRangePageHeight(){
 			return this.finalVirtualPageHeight * this.preloadPage;
@@ -152,59 +153,97 @@ export default {
 		},
 	},
 	methods: {
-		//在使用动态高度虚拟列表时，手动更新指定cell的缓存高度(当cell高度在初始化之后再次改变时调用)，index代表需要更新的cell在列表中的位置，从0开始
+		//在使用动态高度虚拟列表时，若在列表数组中需要插入某个item，需要调用此方法；item:需要插入的item，index:插入的cell位置，若index为2，则插入的item在原list的index=1之后，index从0开始
+		doInsertVirtualListItem(item, index) {
+			if (this.cellHeightMode !== Enum.CellHeightMode.Dynamic) return;
+			this.virtualItemInsertedCount ++;
+			if (!item || Object.prototype.toString.call(item) !== '[object Object]') {
+				item = { item };
+			}
+			const cellIndexKey = this.virtualCellIndexKey;
+			item[cellIndexKey] = `custom-${this.virtualItemInsertedCount}`;
+			item[c.listCellIndexUniqueKey] = `${this.virtualListKey}-${item[cellIndexKey]}`;
+			this.totalData.splice(index, 0, item);
+			this.$nextTick(async () => {
+				let retryCount = 0;
+				while (retryCount <= 10) {
+					await u.wait(c.delayTime);
+					
+					const cellNode = await this._getNodeClientRect(`#zp-id-${item[cellIndexKey]}`, this.finalUseInnerList);
+					if (!cellNode) {
+						retryCount ++;
+						continue;
+					} 
+					
+					const currentHeight = cellNode ? cellNode[0].height : 0;
+					const lastHeightCache = this.virtualHeightCacheList[index - 1];
+					const lastTotalHeight = lastHeightCache ? lastHeightCache.totalHeight : 0;
+					this.virtualHeightCacheList.splice(index, 0, {
+						height: currentHeight,
+						lastTotalHeight,
+						totalHeight: lastTotalHeight + currentHeight
+					});
+					
+					for (let i = index + 1; i < this.virtualHeightCacheList.length; i++) {
+						const thisNode = this.virtualHeightCacheList[i];
+						thisNode.lastTotalHeight += currentHeight;
+						thisNode.totalHeight += currentHeight;
+					}
+					
+					this._updateVirtualScroll(this.oldScrollTop);
+					break;
+				}
+			})
+		},
+		//在使用动态高度虚拟列表时，手动更新指定cell的缓存高度(当cell高度在初始化之后再次改变时调用)；index:需要更新的cell在列表中的位置，从0开始
 		didUpdateVirtualListCell(index) {
 			if (this.cellHeightMode !== Enum.CellHeightMode.Dynamic) return;
 			const currentNode = this.virtualHeightCacheList[index];
-			this._getNodeClientRect(`#zp-id-${index}`,this.finalUseInnerList).then(cellNode => {
-				const cellNodeHeight = cellNode ? cellNode[0].height : 0;
-				
-				const heightDis = cellNodeHeight - currentNode.height;
-				currentNode.height = cellNodeHeight;
-				currentNode.totalHeight = currentNode.lastHeight + cellNodeHeight;
-				
-				for (let i = index + 1; i < this.virtualHeightCacheList.length; i++) {
-					const thisNode = this.virtualHeightCacheList[i];
-					if (i === index + 1) {
-						thisNode.lastHeight = cellNodeHeight;
+			this.$nextTick(() => {
+				this._getNodeClientRect(`#zp-id-${index}`, this.finalUseInnerList).then(cellNode => {
+					const cellNodeHeight = cellNode ? cellNode[0].height : 0;
+					const heightDis = cellNodeHeight - currentNode.height;
+					currentNode.height = cellNodeHeight;
+					currentNode.totalHeight = currentNode.lastTotalHeight + cellNodeHeight;
+					
+					for (let i = index + 1; i < this.virtualHeightCacheList.length; i++) {
+						const thisNode = this.virtualHeightCacheList[i];
+						thisNode.totalHeight += heightDis;
+						thisNode.lastTotalHeight += heightDis;
 					}
-					thisNode.totalHeight += heightDis;
-				}
-			});
+				});
+			})
 		},
-		//在使用动态高度虚拟列表时，若删除了列表数组中的某个item，需要调用此方法以更新高度缓存数组，index代表需要更新的cell在列表中的位置，从0开始
+		//在使用动态高度虚拟列表时，若删除了列表数组中的某个item，需要调用此方法以更新高度缓存数组；index:删除的cell在列表中的位置，从0开始
 		didDeleteVirtualListCell(index) {
 			if (this.cellHeightMode !== Enum.CellHeightMode.Dynamic) return;
 			const currentNode = this.virtualHeightCacheList[index];
 			for (let i = index + 1; i < this.virtualHeightCacheList.length; i++) {
 				const thisNode = this.virtualHeightCacheList[i];
-				if (i === index + 1) {
-					thisNode.lastHeight = currentNode.lastHeight;
-				}
 				thisNode.totalHeight -= currentNode.height;
+				thisNode.lastTotalHeight -= currentNode.height;
 			}
 			this.virtualHeightCacheList.splice(index, 1);
 		},
 		//初始化虚拟列表
 		_virtualListInit() {
 			this.$nextTick(() => {
-				setTimeout(() => {
+				u.delay(() => {
 					this._getNodeClientRect('.zp-scroll-view').then(node => {
 						if (node) {
 							this.pagingOrgTop = node[0].top;
 							this.virtualPageHeight = node[0].height;
 						}
 					});
-				}, c.delayTime);
+				});
 			})
 		},
 		//cellHeightMode为fixed时获取第一个cell高度
 		_updateFixedCellHeight() {
 			this.$nextTick(() => {
-				const updateFixedCellHeightTimeout = setTimeout(() => {
+				u.delay(() => {
 					this._getNodeClientRect(`#zp-id-${0}`,this.finalUseInnerList).then(cellNode => {
 						if (!cellNode) {
-							clearTimeout(updateFixedCellHeightTimeout);
 							if (this.getCellHeightRetryCount.fixed > 10) return;
 							this.getCellHeightRetryCount.fixed ++;
 							this._updateFixedCellHeight();
@@ -213,45 +252,67 @@ export default {
 							this._updateVirtualScroll(this.oldScrollTop);
 						}
 					});
-				}, c.delayTime);
+				}, c.delayTime, 'updateFixedCellHeightDelay');
 			})
 		},
 		//cellHeightMode为dynamic时获取每个cell高度
-		_updateDynamicCellHeight(list) {
+		_updateDynamicCellHeight(list, dataFrom = 'bottom') {
+			const dataFromTop = dataFrom === 'top';
+			const heightCacheList = this.virtualHeightCacheList;
+			const currentCacheList = dataFromTop ?  [] : heightCacheList;
+			let listTotalHeight = 0;
 			this.$nextTick(() => {
-				const updateDynamicCellHeightTimeout = setTimeout(async () => {
+				u.delay(async () => {
 					for (let i = 0; i < list.length; i++) {
-						let item = list[i];
-						const cellNode = await this._getNodeClientRect(`#zp-id-${item[c.listCellIndexKey]}`,this.finalUseInnerList);
+						const cellNode = await this._getNodeClientRect(`#zp-id-${list[i][this.virtualCellIndexKey]}`, this.finalUseInnerList);
 						const currentHeight = cellNode ? cellNode[0].height : 0;
 						if (!cellNode) {
-							clearTimeout(updateDynamicCellHeightTimeout);
-							this.virtualHeightCacheList = this.virtualHeightCacheList.slice(-i);
-							if (this.getCellHeightRetryCount.dynamic > 10) return;
-							this.getCellHeightRetryCount.dynamic++;
-							this._updateDynamicCellHeight(list);
-							break;
-						}
-						const lastHeightCache = this.virtualHeightCacheList.length ? this.virtualHeightCacheList.slice(-1)[0] : null;
-						const lastHeight = lastHeightCache ? lastHeightCache.totalHeight : 0;
-						this.virtualHeightCacheList.push({
+							if (this.getCellHeightRetryCount.dynamic <= 10) {
+								heightCacheList.splice(heightCacheList.length - i, i);
+								this.getCellHeightRetryCount.dynamic ++;
+								this._updateDynamicCellHeight(list, dataFrom);
+							}
+							return;
+						} 
+						const lastHeightCache = currentCacheList.length ? currentCacheList.slice(-1)[0] : null;
+						const lastTotalHeight = lastHeightCache ? lastHeightCache.totalHeight : 0;
+						currentCacheList.push({
 							height: currentHeight,
-							lastHeight: lastHeight,
-							totalHeight: lastHeight + currentHeight
+							lastTotalHeight,
+							totalHeight: lastTotalHeight + currentHeight
 						});
+						if (dataFromTop) {
+							listTotalHeight += currentHeight;
+						}
+					}
+					if (dataFromTop && list.length) {
+						for (let i = 0; i < heightCacheList.length; i++) {
+							const heightCacheItem = heightCacheList[i];
+							heightCacheItem.lastTotalHeight += listTotalHeight;
+							heightCacheItem.totalHeight += listTotalHeight;
+						}
+						this.virtualHeightCacheList = currentCacheList.concat(heightCacheList);
 					}
 					this._updateVirtualScroll(this.oldScrollTop);
-				}, c.delayTime)
+				}, c.delayTime, 'updateDynamicCellHeightDelay')
 			})
 		},
 		//设置cellItem的index
-		_setCellIndex(list, isFirstPage) {
-			let lastItemIndex = 0;
-			if (!isFirstPage) {
-				lastItemIndex = this.realTotalData.length;
-				const lastItem = this.realTotalData.length ? this.realTotalData.slice(-1)[0] : null;
-				if (lastItem && lastItem[c.listCellIndexKey] !== undefined) {
-					lastItemIndex = lastItem[c.listCellIndexKey] + 1;
+		_setCellIndex(list, dataFrom = 'bottom') {
+			let currentItemIndex = 0;
+			const cellIndexKey = this.virtualCellIndexKey;
+			if (this.totalData.length) {
+				if (dataFrom === 'bottom') {
+					currentItemIndex = this.realTotalData.length;
+					const lastItem = this.realTotalData.length ? this.realTotalData.slice(-1)[0] : null;
+					if (lastItem && lastItem[cellIndexKey] !== undefined) {
+						currentItemIndex = lastItem[cellIndexKey] + 1;
+					}
+				} else if (dataFrom === 'top') {
+					const firstItem = this.realTotalData.length ? this.realTotalData[0] : null;
+					if (firstItem && firstItem[cellIndexKey] !== undefined) {
+						currentItemIndex = firstItem[cellIndexKey] - list.length;
+					}
 				}
 			} else {			
 				this._resetDynamicListState();
@@ -259,14 +320,14 @@ export default {
 			for (let i = 0; i < list.length; i++) {
 				let item = list[i];
 				if (!item || Object.prototype.toString.call(item) !== '[object Object]') {
-					item = {item};
+					item = { item };
 				}
-				item[c.listCellIndexKey] = lastItemIndex + i;
-				item[c.listCellIndexUniqueKey] = `${this.virtualListKey}-${item[c.listCellIndexKey]}`;
+				item[cellIndexKey] = currentItemIndex + i;
+				item[c.listCellIndexUniqueKey] = `${this.virtualListKey}-${item[cellIndexKey]}`;
 				list[i] = item;
 			}
 			this.getCellHeightRetryCount.dynamic = 0;
-			this.cellHeightMode === Enum.CellHeightMode.Dynamic && this._updateDynamicCellHeight(list);
+			this.cellHeightMode === Enum.CellHeightMode.Dynamic && this._updateDynamicCellHeight(list, dataFrom);
 		},
 		//更新scroll滚动
 		_updateVirtualScroll(scrollTop, scrollDiff = 0) {
@@ -297,28 +358,28 @@ export default {
 				
 				let startTopRangeIndex = this.virtualTopRangeIndex;
 				if (scrollDirection === 'bottom') {
-					for (let i = startTopRangeIndex; i < heightCacheList.length;i++){
+					for (let i = startTopRangeIndex; i < heightCacheList.length; i++){
 						const heightCacheItem = heightCacheList[i];
 						if (heightCacheItem && heightCacheItem.totalHeight > topRangePageOffset) {
 							this.virtualTopRangeIndex = i;
-							this.virtualPlaceholderTopHeight = heightCacheItem.lastHeight;
+							this.virtualPlaceholderTopHeight = heightCacheItem.lastTotalHeight;
 							break;
 						}
 					}
 				} else {
 					let topRangeMatched = false;
-					for (let i = startTopRangeIndex; i >= 0;i--){
+					for (let i = startTopRangeIndex; i >= 0; i--){
 						const heightCacheItem = heightCacheList[i];
 						if (heightCacheItem && heightCacheItem.totalHeight < topRangePageOffset) {
 							this.virtualTopRangeIndex = i;
-							this.virtualPlaceholderTopHeight = heightCacheItem.lastHeight;
+							this.virtualPlaceholderTopHeight = heightCacheItem.lastTotalHeight;
 							topRangeMatched = true;
 							break;
 						}
 					}
 					!topRangeMatched && this._resetTopRange();
 				}
-				for (let i = this.virtualTopRangeIndex; i < heightCacheList.length;i++){
+				for (let i = this.virtualTopRangeIndex; i < heightCacheList.length; i++){
 					const heightCacheItem = heightCacheList[i];
 					if (heightCacheItem && heightCacheItem.totalHeight > bottomRangePageOffset) {
 						virtualBottomRangeIndex = i;
@@ -339,7 +400,7 @@ export default {
 		},
 		//更新fixedCell模式下topRangeIndex&placeholderTopHeight
 		_updateFixedTopRangeIndex(scrollIndex) {
-			let virtualTopRangeIndex = this.virtualCellHeight === 0 ? 0 : scrollIndex - parseInt(this.finalVirtualPageHeight / this.virtualCellHeight) * this.preloadPage;
+			let virtualTopRangeIndex = this.virtualCellHeight === 0 ? 0 : scrollIndex - (parseInt(this.finalVirtualPageHeight / this.virtualCellHeight) || 1) * this.preloadPage;
 			virtualTopRangeIndex *= this.virtualListCol;
 			virtualTopRangeIndex = Math.max(0, virtualTopRangeIndex);
 			this.virtualTopRangeIndex = virtualTopRangeIndex;
@@ -347,7 +408,7 @@ export default {
 		},
 		//更新fixedCell模式下bottomRangeIndex&placeholderBottomHeight
 		_updateFixedBottomRangeIndex(scrollIndex) {
-			let virtualBottomRangeIndex = this.virtualCellHeight === 0 ? this.pageSize : scrollIndex + parseInt(this.finalVirtualPageHeight / this.virtualCellHeight) * (this.preloadPage + 1);
+			let virtualBottomRangeIndex = this.virtualCellHeight === 0 ? this.pageSize : scrollIndex + (parseInt(this.finalVirtualPageHeight / this.virtualCellHeight) || 1) * (this.preloadPage + 1);
 			virtualBottomRangeIndex *= this.virtualListCol;
 			virtualBottomRangeIndex = Math.min(this.realTotalData.length, virtualBottomRangeIndex);
 			this.virtualBottomRangeIndex = virtualBottomRangeIndex;
@@ -360,7 +421,7 @@ export default {
 			if (shouldUpdateList) {
 				this.updateVirtualListFromDataChange = false;
 				this.lastVirtualTopRangeIndex =  this.virtualTopRangeIndex;
-				this.lastVirtualBottomRangeIndex =  this.virtualBottomRangeIndex;
+				this.lastVirtualBottomRangeIndex = this.virtualBottomRangeIndex;
 				this.virtualList = this.realTotalData.slice(this.virtualTopRangeIndex, this.virtualBottomRangeIndex + 1);
 			}
 		},

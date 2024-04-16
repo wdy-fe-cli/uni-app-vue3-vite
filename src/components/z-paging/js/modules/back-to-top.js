@@ -53,12 +53,12 @@ export default {
 			return this.usePageScroll ? false : this.enableBackToTop;
 		},
 		finalBackToTopThreshold() {
-			return u.convertTextToPx(this.backToTopThreshold);
+			return u.convertToPx(this.backToTopThreshold);
 		},
 		finalBackToTopStyle() {
 			const backToTopStyle = this.backToTopStyle;
 			if (!backToTopStyle.bottom) {
-				backToTopStyle.bottom = this.windowBottom + u.convertTextToPx(this.backToTopBottom) + 'px';
+				backToTopStyle.bottom = this.windowBottom + u.convertToPx(this.backToTopBottom) + 'px';
 			}
 			if(!backToTopStyle.position){
 				backToTopStyle.position = this.usePageScroll ? 'fixed': 'absolute';
@@ -82,14 +82,14 @@ export default {
 				if (!this.showBackToTopClass) {
 					this.showBackToTopClass = true;
 					this.lastBackToTopShowTime = new Date().getTime();
-					setTimeout(() => {
+					u.delay(() => {
 						this.backToTopClass = 'zp-back-to-top zp-back-to-top-show';
 					}, 300)
 				}
 			} else {
 				if (this.showBackToTopClass) {
 					this.backToTopClass = 'zp-back-to-top zp-back-to-top-hide';
-					setTimeout(() => {
+					u.delay(() => {
 						this.showBackToTopClass = false;
 					}, new Date().getTime() - this.lastBackToTopShowTime < 500 ? 0 : 300)
 				}
