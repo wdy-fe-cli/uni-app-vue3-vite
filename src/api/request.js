@@ -1,4 +1,5 @@
 import { getStorage, setStorage } from '@/utils/storage.js'
+import ENV_CONFIG from './env'
 import { login } from '@/utils/login'
 
 const waitingList = [] // 等待请求队列
@@ -18,12 +19,19 @@ const requestPromise = (resolve, reject, url, method = 'get', params, callback) 
   let headers = {}
   if (token) {
     headers.authToken = token // 让每个请求携带自定义token 请根据实际情况自行修改
+    headers.masterOrgId = getStorage('masterOrgId')
+    headers.moduleCode = getStorage('moduleCode')
+    headers.appCode = getStorage('appCode')
   }
 
   let success = false
+  let baseUrl = ENV_CONFIG.VITE_API_URL
+  // #ifdef H5
+  baseUrl = '/api'
+  // #endif
 
   const requestTask = uni.request({
-    url: url,
+    url: url.startsWith('https://') ? url : baseUrl + url,
     method: method ? method.toUpperCase() : '',
     header: headers,
     data: params,
@@ -40,7 +48,7 @@ const requestPromise = (resolve, reject, url, method = 'get', params, callback) 
           if (result.data.isError) {
             uni.showToast({
               title: result.data.message,
-              icon: 'none',
+              icon: 'none'
             })
             reject(result.data)
           } else {
@@ -53,7 +61,7 @@ const requestPromise = (resolve, reject, url, method = 'get', params, callback) 
         } else {
           uni.showToast({
             title: errorMsg,
-            icon: 'none',
+            icon: 'none'
           })
           reject(errorMsg)
           // reject(result.data)
@@ -61,7 +69,7 @@ const requestPromise = (resolve, reject, url, method = 'get', params, callback) 
       } else {
         uni.showToast({
           title: errorMsg,
-          icon: 'none',
+          icon: 'none'
         })
         reject(errorMsg)
       }
@@ -69,7 +77,7 @@ const requestPromise = (resolve, reject, url, method = 'get', params, callback) 
     fail(res) {
       uni.showToast({
         title: '服务异常',
-        icon: 'none',
+        icon: 'none'
       })
       reject('服务异常')
     },
@@ -85,7 +93,7 @@ const requestPromise = (resolve, reject, url, method = 'get', params, callback) 
         callback()
       }
       excuteWaitingList()
-    },
+    }
   })
   excutingList.push(requestTask)
 }

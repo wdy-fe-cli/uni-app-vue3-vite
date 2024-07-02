@@ -1,12 +1,9 @@
 <script>
-import initPermission from '@/utils/permission.js'
 export default {
   globalData: {
     socketIO: null,
   },
-  onLaunch(ot) {
-    initPermission()
-  },
+  onLaunch(ot) {},
   methods: {},
   onShow() {
     console.log('App Show')

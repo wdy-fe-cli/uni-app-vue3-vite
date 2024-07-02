@@ -115,9 +115,6 @@ devDependencies:
   postcss-import:
     specifier: ^16.1.0
     version: 16.1.0(postcss@8.4.38)
-  postcss-rem-to-responsive-pixel:
-    specifier: ^6.0.1
-    version: 6.0.1
   postcss-scss:
     specifier: ^4.0.9
     version: 4.0.9(postcss@8.4.38)
@@ -133,9 +130,6 @@ devDependencies:
   tailwindcss:
     specifier: ^3.4.3
     version: 3.4.3
-  tailwindcss-rem2px-preset:
-    specifier: ^1.0.3
-    version: 1.0.3(tailwindcss@3.4.3)
   undefined:
     specifier: ^0.1.0
     version: 0.1.0
@@ -8064,12 +8058,7 @@ packages:
       postcss: ^8.2.14
     dependencies:
       postcss: 8.4.38
-      postcss-selector-parser: 6.0.13
-    dev: true
-
-  /postcss-rem-to-responsive-pixel@6.0.1:
-    resolution: {integrity: sha512-CbqKssPDiz+bT/HHI07KChLPm1IgnCCOqxCTxTw3/ddlpgTQeP8+oYzrjeC6Weo5UsKcRrhgScbmTBI1xsJEEA==}
-    engines: {node: '>=16.6.0'}
+      postcss-selector-parser: 6.0.16
     dev: true
 
   /postcss-safe-parser@6.0.0(postcss@8.4.38):
@@ -8763,7 +8752,7 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
     dependencies:
-      '@jridgewell/gen-mapping': 0.3.3
+      '@jridgewell/gen-mapping': 0.3.5
       commander: 4.1.1
       glob: 10.3.12
       lines-and-columns: 1.2.4
@@ -8823,14 +8812,6 @@ packages:
     resolution: {integrity: sha512-8ftwWd+XnQtZ/aGbatrN4QFNGrKJzmbtixW+ODpci7pyoTajg4sonPP8aFLESAcuVxaC1FyDESt+SpfFCH9rZQ==}
     dev: true
 
-  /tailwindcss-rem2px-preset@1.0.3(tailwindcss@3.4.3):
-    resolution: {integrity: sha512-uG9CYE1WXsqSUIyqmHDyr63Zagfjn2Igk32gGPPzvq6FvZ2GVQx7sYj+pflkKA65VZw3rUsraQQoGQw2+EB31A==}
-    peerDependencies:
-      tailwindcss: ^2.0.0 || >=3.0.0
-    dependencies:
-      tailwindcss: 3.4.3
-    dev: true
-
   /tailwindcss@3.4.3:
     resolution: {integrity: sha512-U7sxQk/n397Bmx4JHbJx/iSOOv5G+II3f1kpLpY2QeUv5DcPdcTsYLlusZfq1NthHS1c1cZoyFmmkex1rzke0A==}
     engines: {node: '>=14.0.0'}
@@ -8855,7 +8836,7 @@ packages:
       postcss-js: 4.0.1(postcss@8.4.38)
       postcss-load-config: 4.0.2(postcss@8.4.38)
       postcss-nested: 6.0.1(postcss@8.4.38)
-      postcss-selector-parser: 6.0.13
+      postcss-selector-parser: 6.0.16
       resolve: 1.22.4
       sucrase: 3.35.0
     transitivePeerDependencies:

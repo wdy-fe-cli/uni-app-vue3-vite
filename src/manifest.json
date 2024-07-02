@@ -1,5 +1,5 @@
 {
-  "name": "高速驿网",
+  "name": "商家端管理",
   "appid": "",
   "description": "",
   "versionName": "1.0.0",
@@ -24,39 +24,6 @@
       "scope.userLocation": {
         "desc": "你的位置信息将用于小程序位置接口的效果展示"
       }
-    }
-  },
-  "h5": {
-    "devServer": {
-      // uniapp中需要吧证书内容复制进入，并且换行用\n替换
-      // "https": {
-      //   "cert": "-----BEGIN CERTIFICATE-----\nMIIDeDCCAmCgAwIBAgIFODU1OTMwDQYJKoZIhvcNAQELBQAwXjEQMA4GA1UEAxMH\nVGVzdCBDQTELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNV\nBAcTDVNhbiBGcmFuY2lzY28xEDAOBgNVBAoTB1Rlc3QgQ0EwHhcNMjMxMjI2MDEw\nNTUzWhcNMjQxMjI1MDEwNTUzWjAtMSswKQYDVQQDEyIxMjcuMC4wLjEsbG9jYWxo\nb3N0LDE5Mi4xNjguMTAuMTE5MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC\nAQEA0/NXGIGue6szkYrPzPKWI70HoSRJbv94vEgnPWdtOvwJtlI+DrCI9fNANMA4\n84p3Yqohyrm7Pmed6Wj6KSqftxbaHZZDWryTJ/bZ0gTGq+qF0gA8l8l87+Xkzi1K\ngzn6JKrPV9ObRagoVLCtsQcGsjHPOo3DMWAUeyuyYokWBPak1NIZmQ5gC5w6/+PS\nUYOr1L/sb3H08R3ijZ4rx3JJ6X4axNvXyQGQLCR9CwBypff68xavRWPfiI6wqvuT\nL9I1nqvbrzXGLTiCvWdNg07dd5HXwDfMhiwQqOKvwbvhB1yP2QsZoFRqcmorJdiT\nOopoyILE9eDums2o6LTnmT3pAQIDAQABo24wbDAMBgNVHRMBAf8EAjAAMA4GA1Ud\nDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwLQYDVR0R\nBCYwJIIiMTI3LjAuMC4xLGxvY2FsaG9zdCwxOTIuMTY4LjEwLjExOTANBgkqhkiG\n9w0BAQsFAAOCAQEAQRPHcRbHmRHhDIfUU+x3e6Am6tDnImghr9Ys5A4M5HX6oFyP\nDyagTF18OJueSP47mByLfHObT6XKpx1vA0THljun2twDNV+UyBuOhvZKpajd3eV+\nTM5S+wmQe204ku3gCwJNyOoyV3qUvH4oq8iiowKfMSWg0GruGSYSDw2YfycbtAGT\nSFEIQgnJp6NSu3znk2YVcGKN6ib/f0RmFVyy2f+3ICS0pg+z3gLkyTOuXmeEBZ9E\ngL8gPDFvAk0z9WIWaqH/DY11PtUtMndXzzSSF7d7VFlsmqjC4vTwu95jX6dnONBU\nboWPfUmoJikDOzjwrH2l/G/WlCVbgiDZvrkTTQ==\n-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----\nMIIDXzCCAkegAwIBAgIGMTQwNDc5MA0GCSqGSIb3DQEBCwUAMF4xEDAOBgNVBAMT\nB1Rlc3QgQ0ExCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYD\nVQQHEw1TYW4gRnJhbmNpc2NvMRAwDgYDVQQKEwdUZXN0IENBMB4XDTIzMTIyNjAx\nMDUyOFoXDTI0MTIyNTAxMDUyOFowXjEQMA4GA1UEAxMHVGVzdCBDQTELMAkGA1UE\nBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBGcmFuY2lz\nY28xEDAOBgNVBAoTB1Rlc3QgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK\nAoIBAQCxpTy7QVtNxEjJaiOZW4b/oTswgmhgkVqtK/TB3/2WNmu/fJYEfsgvBqpB\n1MS2qIDBbGhtacGWMTW9n6pax317If5N89L36xuvSIUkOmINabJqbi5Cd5dFCqZs\nhlRZE/pVa4t7IJiyhY7aIErsQLbHwjOKCFLv5op/qoCzXVIXgCADl/3JZ4h2LzVF\nMQXplvay1uui1kdWwfeVcNQAq/jGTGg6wIguXcxwABFcHWA20d0+rrJL+RrzryC+\naNR9W29ptGlxCMTqO49j2bPFYei8vOn97kwrbkzN7XWxKbXNPcZyHTQulhFFrx5G\ns/DiSN4ZFvnYAtZeCvoDtTEw4R+bAgMBAAGjIzAhMA8GA1UdEwEB/wQFMAMBAf8w\nDgYDVR0PAQH/BAQDAgIEMA0GCSqGSIb3DQEBCwUAA4IBAQBkSL77NeOjU7b3Bvz7\nb5fYqLk4cMfobPIqbeq96A62iifAY8h9sOR7qrkuO8b1PhWd413rJ+2BAPt/7zGf\nfn02/u5ImS6YGTI5JLEF0uoik6xfu0oCdUmpxo2H7LLWynohPIxq8hl39DpcYQQI\nAci1f3Lzs9SB2jZKeUshHY/IQp63YWoFRwqxKHWKEG3glIhrfkPztrDttLcwMk1v\n5WeeByEYxRH1/GbvcDJM7Ql9hnnTuv33rzTWG9E0Btntzs4LBOV0wPjtXdUOPy0I\n8HLV/KVFiCsW3V/daaKuPAezWjOAM2nYfX4uXtSp+Ckr3JSu0gWIYu39Ja7H70Lu\nCato\n-----END CERTIFICATE-----",
-      //   "key": "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA0/NXGIGue6szkYrPzPKWI70HoSRJbv94vEgnPWdtOvwJtlI+\nDrCI9fNANMA484p3Yqohyrm7Pmed6Wj6KSqftxbaHZZDWryTJ/bZ0gTGq+qF0gA8\nl8l87+Xkzi1Kgzn6JKrPV9ObRagoVLCtsQcGsjHPOo3DMWAUeyuyYokWBPak1NIZ\nmQ5gC5w6/+PSUYOr1L/sb3H08R3ijZ4rx3JJ6X4axNvXyQGQLCR9CwBypff68xav\nRWPfiI6wqvuTL9I1nqvbrzXGLTiCvWdNg07dd5HXwDfMhiwQqOKvwbvhB1yP2QsZ\noFRqcmorJdiTOopoyILE9eDums2o6LTnmT3pAQIDAQABAoIBAAbRQO/s2+vmadY4\nnM5+zw1/OwuX2zTSytNjjr+O4BiRms5eftiCHSWsGViZBjvvLD/kMQoQR1GOi6nC\nUqmYUWLWPVXOS4RTpHgYnJEAzlMhTAShNVG8jWQ6BM4M7uShrMYZKGouyEPJUOLI\nfA3BqBl7OKstfCXObVo44ZgByM+IAGvw57OumLUiXKtU9353PcsVSZ1loh+VyY88\naqp4x46jdHBIECVoLdlNnupxYcod4XZX2OWuRcfYvGLDD0Mqhgl+9KW84yYiBixc\n9s5usfsGVgMFxPS3jL9auZ1R0SxsEjrPKlV4enPBn48C5N1dbzL6OkPQ6/t0/TTy\nwZ+MK0ECgYEA9Vj92N9HHmkD4e0pdPy+K8+IRlEj1blQXIXLnBnd2G7dAKgkl199\nOVdUPhlQYwlI5LG0GRFxTkhldnJ4zJknla3vXTpeGpn5wtgn99Ti0KaBS+0k9sdN\nV+LYCYOrYwjBE9vqpnVQwqXat1tySNnYESAtMRf03J/pAGU3d63h6K0CgYEA3Sck\n7wuYFuuSyRR47axdB0R6maXtBsgWP/SjNfIj+/5kfjZmj+ZR6N4bg24CIKzBHIsQ\nGSzDBwj2reUGqK+1pr0f0PPtbA75P1zZ6PFGmIJU6eYLjRBq7ldZtkRyzOcjqcl3\nQ3xIKH/MvglAamgwkt8NiHIuKMPiJhenYwJ1aCUCgYEA5T4Qefot5mEzKn9BdDjP\nq/nOl/0qoYD0cG7nT2Tv31G/F+UDw5iKVfCeGyPl85NyU5Ui9SVSHFYSz7in3Gvi\nC74oYJCv6uUh9Iep2KxGfbSGLR5YomiYgNzJBSLNGczNMzQRrRUCr8zubtJ4F0/M\nzjulXjDHLvoPaLoqOJ307kUCgYAeo+XCGOEhi9HyehunElJxR1OVJiAI6H/srIBQ\nYRQLPdu+gNsE5OxET0GQnBU/Ya//vGSmmEUNHHjQ7wJVLMMGLv3RfXpPlmOCG+M1\nGvik+Km7HlxLVxL5orCTSDh/myadx4P2namBsvMzASUjmPvh3XWKigdLLpiOnoha\nd2S84QKBgQCrdLH7PGTnC0e1qCOAB2yomeMhWNLV26ix89XfyWrHtBq4ZlUVmgEi\n/KiSeIm7pwaiTDq/InTqiu+vqh7rCKtgMwL/A/gx4BY4uUd6gfbQ25SsPR6v45oe\nd/bLpuJ4VJfDrHwSR1S3M2UKeW2pNCsj78S3PsvldzRqQ8er2fBSGg==\n-----END RSA PRIVATE KEY-----"
-      // },
-      "https": false,
-      "disableHostCheck": true,
-      "proxy": {
-        "/api": {
-          "target": "http://192.168.10.213:8002/",
-          "ws": true,
-          "changOrigin": true,
-          "pathRewrite": {
-            "^/api": ""
-          }
-        },
-        "/cj-api": {
-          "target": "https://hy.zcgc.cn/api/msh5/do/",
-          "ws": true,
-          "changOrigin": true,
-          "pathRewrite": {
-            "^/api": ""
-          }
-        }
-      }
-    },
-    "router": {
-      "mode": "history",
-      "base": "/func-h5/"
     }
   },
   "mp-alipay": {

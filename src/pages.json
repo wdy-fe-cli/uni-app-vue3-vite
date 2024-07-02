@@ -5,25 +5,12 @@
       "^uv-(.*)": "@climblee/uv-ui/components/uv-$1/uv-$1.vue"
     }
   },
-
   "pages": [
     {
       "path": "pages/home/index",
       "style": {
         "navigationBarTitleText": "首页",
         "navigationStyle": "custom"
-      }
-    },
-    {
-      "path": "pages/setting/user-agreement",
-      "style": {
-        "navigationBarTitleText": "用户协议"
-      }
-    },
-    {
-      "path": "pages/setting/privacy-agreement",
-      "style": {
-        "navigationBarTitleText": "隐私协议"
       }
     }
   ],

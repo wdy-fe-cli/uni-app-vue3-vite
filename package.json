@@ -1,5 +1,5 @@
 {
-  "name": "zshl-business",
+  "name": "demo",
   "version": "0.0.0",
   "scripts": {
     "dev:h5": "uni --mode development",
@@ -83,13 +83,11 @@
     "postcss-comment": "^2.0.0",
     "postcss-html": "^1.6.0",
     "postcss-import": "^16.1.0",
-    "postcss-rem-to-responsive-pixel": "^6.0.1",
     "postcss-scss": "^4.0.9",
     "prettier": "2",
     "sass": "^1.66.1",
     "sass-loader": "^14.1.1",
     "tailwindcss": "^3.4.3",
-    "tailwindcss-rem2px-preset": "^1.0.3",
     "undefined": "^0.1.0",
     "vite": "4.1.4"
   },
